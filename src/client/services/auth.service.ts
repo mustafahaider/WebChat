@@ -9,7 +9,7 @@ import { Token } from "../../server/token";
 
 @Injectable()
 export class AuthService {
-  private socket: SocketIO.Socket = io();
+  private socket = io();
   private isAuthedSubj = new Subject<boolean>();
   private tokenSubj = new Subject<string>();
   readonly TokenKey = "auth-token";
@@ -36,45 +36,32 @@ export class AuthService {
       this.socket.on(Event.Disconnect, () => {
         this.onDisconnect(this.socket);
       });
-      this.socket.on(Event.Threads, (args) => {
-        console.log("received thread: ", args)
-      });
-      this.socket.on(Event.Threads, (args) => {
-        console.log("second registered thread eent: " ,args)
-      });
     });
-  }
-
-
-  register(event: Event, f: (s: SocketIO.Socket, ...args: any[]) => void ) {
-    this.socket.on(event, (...args) => {
-      console.log("auth-service received event: ", event, " to be handled by ", f.name)
-      f(this.socket, ...args)})
   }
 
   emit(event: string, ...args: any[]) {
     this.socket.emit(event, ...args);
   }
 
-  onToken(socket: SocketIO.Socket, token: string): boolean {
+  onToken(socket: any, token: string): boolean {
     console.log("soc-service: tokenstr: ", token);
     this.tokenSubj.next(token);
     return true;
   }
 
-  onPaired(socket: SocketIO.Socket, token: Token): boolean {
+  onPaired(socket: any, token: Token): boolean {
     this.cache.set(this.TokenKey, token);
     this.isAuthedSubj.next(true);
     this.tokenSubj.complete();
     return true;
   }
 
-  onSuspend(socket: SocketIO.Socket): boolean {
+  onSuspend(socket: any): boolean {
     this.tokenSubj.complete();
     return true;
   }
 
-  onDisconnect(socket: SocketIO.Socket): boolean {
+  onDisconnect(socket: any): boolean {
     this.tokenSubj.complete();
     this.isAuthedSubj.complete();
     return true;

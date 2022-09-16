@@ -2,7 +2,6 @@ import { of as observableOf, Observable, Subject } from "rxjs";
 import { map } from "rxjs/operators";
 import Cache from "./cache";
 import * as http from "http";
-import * as https from "https";
 
 
 /**
@@ -10,7 +9,7 @@ import * as https from "https";
  * with a cache layer
  */
 export default class HttpHandler {
-  constructor(private cache: Cache) { }
+  constructor(private cache: Cache) {}
 
   host(url?: string): string {
     return window.location.origin + url;
@@ -18,31 +17,9 @@ export default class HttpHandler {
 
   get(url: string): Observable<any> {
     var subj = new Subject<any>();
-    if (url.startsWith("https")) {
-      console.log(`fetching url: ${url}`);
-      https.get(url, (res) => {
-        res.setEncoding('utf8');
-        let rawData = '';
-        res.on('data', (chunk) => { rawData += chunk; });
-        res.on('end', () => {
-          try {
-            const parsedData = JSON.parse(rawData);
-            subj.next(parsedData);
-          } catch (e) {
-            console.error(e.message);
-          }
-        });
-      }).on("error", (err) => {
-        console.error(`error fetching ${url}: ${err.message}`)
-      });
-    } else {
-      http.get(url, (res) => {
-        console.log("http-req-success: ", url)
-        res.on('data', (d) => {
-          subj.next(d)
-        });
-      });
-    }
+    http.get(url, (res:http.IncomingMessage)=>{
+      subj.next(res)
+    });
     return subj.asObservable();
   }
 
