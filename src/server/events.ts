@@ -10,10 +10,8 @@ export enum Event {
   TokenRequest = "tokenRequest", // received from clients to obtain token
   Token = "token", // emitted by server with generated token
   Paired = "paired",
-  Suspend = "suspend",
-  ThreadsRequest = "threadsRequest",
-  Threads = "threads",
+  Suspend = "suspend"
 }
 
 // Handler returns true if socket event was successfully handled, false otherwise.
-export type Handler = (socket: SocketIO.Socket, ...args: any[]) => boolean;
+export type Handler = (socket: any, ...args: any[]) => boolean;

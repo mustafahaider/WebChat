@@ -1,6 +1,6 @@
 
 export default class Cache {
-  storage = {}
+  storage: Map<string, string> = new Map<string, string>();
 
   constructor() {}
 
@@ -10,11 +10,7 @@ export default class Cache {
    * @param key
    */
   get(key: string): any {
-    const strVal = this.storage[key];
-    if (strVal == undefined) {
-      console.log("cache couldn't resolve: ", key, this.storage, "\n\n")
-      return undefined;
-    }
+    const strVal = this.storage.get(key);
     return JSON.parse(strVal);
   }
 
@@ -31,7 +27,7 @@ export default class Cache {
       throw new Error("CacheService.set(): invalid/null key: " + String(key));
     }
     const strVal = JSON.stringify(value);
-    this.storage[key] = strVal;
+    this.storage.set(key, strVal);
     return strVal;
   }
 }
